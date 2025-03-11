@@ -57,8 +57,8 @@ spawn(function()
     -- 🚀 Xóa GUI ngay khi loading đạt 100%
     ScreenGui:Destroy()
 
-    -- ⏳ Chờ 1 giây trước khi tải script chính
-    wait(1)
+    -- ⏳ Chờ 0.1 giây trước khi tải script chính
+    wait(0.1)
 
     -- 🕒 Load script chính
     local success, err = pcall(function()
