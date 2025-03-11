@@ -54,18 +54,18 @@ spawn(function()
         wait(0.05)
     end
 
-    -- ⏳ Chờ 1 giây sau khi loading đầy
-    wait(1)
-
-    -- 🛑 Hủy GUI trước khi tải script chính
+    -- 🚀 Xóa GUI ngay khi loading đạt 100%
     ScreenGui:Destroy()
+
+    -- ⏳ Chờ 1 giây trước khi tải script chính
+    wait(1)
 
     -- 🕒 Load script chính
     local success, err = pcall(function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/Shade-vex/b/refs/heads/main/Aaa.txt"))()
     end)
 
-    -- 🛑 Nếu có lỗi, cảnh báo trong Output
+    -- 🛑 Cảnh báo nếu tải lỗi
     if not success then
         warn("❌ Lỗi khi tải script:", err)
     end
