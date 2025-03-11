@@ -21,7 +21,7 @@ MainFrame.BorderColor3 = Color3.fromRGB(255, 255, 255)
 ProfileImage.Parent = MainFrame
 ProfileImage.Size = UDim2.new(0, 50, 0, 50)
 ProfileImage.Position = UDim2.new(0, 10, 0, 10)
-ProfileImage.Image = "rbxassetid://94011781668645" -- Thay YOUR_IMAGE_ID bằng ID hình ảnh của bạn
+ProfileImage.Image = "rbxassetid://94011781668645"
 ProfileImage.BackgroundTransparency = 1
 
 TextLabel.Parent = MainFrame
@@ -57,17 +57,19 @@ spawn(function()
     -- ⏳ Chờ 1 giây sau khi loading đầy
     wait(1)
 
+    -- 🛑 Hủy GUI trước khi tải script chính
+    ScreenGui:Destroy()
+
     -- 🕒 Load script chính
     local success, err = pcall(function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/Shade-vex/b/refs/heads/main/Aaa.txt"))()
     end)
 
-    -- 🛑 Xóa GUI khi hoàn tất
-    if success then
-        TextLabel.Text = "✅ Tải thành công!"
-        wait(1)
-    else
-        TextLabel.Text = "❌ Lỗi: " .. err
+    -- 🛑 Nếu có lỗi, cảnh báo trong Output
+    if not success then
+        warn("❌ Lỗi khi tải script:", err)
+    end
+end)Lỗi: " .. err
         warn("Lỗi khi tải script:", err)
         wait(2)
     end
