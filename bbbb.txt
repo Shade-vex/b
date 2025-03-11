@@ -69,9 +69,4 @@ spawn(function()
     if not success then
         warn("❌ Lỗi khi tải script:", err)
     end
-end)Lỗi: " .. err
-        warn("Lỗi khi tải script:", err)
-        wait(2)
-    end
-    ScreenGui:Destroy()
 end)
