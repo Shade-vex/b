@@ -1,0 +1,74 @@
+-- 📌 Tạo GUI Loading
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local ProfileImage = Instance.new("ImageLabel")
+local ProgressBar = Instance.new("Frame")
+local ProgressFill = Instance.new("Frame")
+local TextLabel = Instance.new("TextLabel")
+local UICorner = Instance.new("UICorner")
+
+-- 🔹 Cài đặt GUI
+ScreenGui.Parent = game.CoreGui
+ScreenGui.Name = "LoadingGUI"
+
+MainFrame.Parent = ScreenGui
+MainFrame.Size = UDim2.new(0, 350, 0, 120)
+MainFrame.Position = UDim2.new(0.5, -175, 0.5, -60)
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+MainFrame.BorderSizePixel = 2
+MainFrame.BorderColor3 = Color3.fromRGB(255, 255, 255)
+
+ProfileImage.Parent = MainFrame
+ProfileImage.Size = UDim2.new(0, 50, 0, 50)
+ProfileImage.Position = UDim2.new(0, 10, 0, 10)
+ProfileImage.Image = "rbxassetid://94011781668645" -- Thay YOUR_IMAGE_ID bằng ID hình ảnh của bạn
+ProfileImage.BackgroundTransparency = 1
+
+TextLabel.Parent = MainFrame
+TextLabel.Size = UDim2.new(1, -70, 0, 30)
+TextLabel.Position = UDim2.new(0, 70, 0, 10)
+TextLabel.Text = "by Rimuru HRB"
+TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.TextScaled = true
+TextLabel.Font = Enum.Font.SourceSansBold
+TextLabel.BackgroundTransparency = 1
+
+ProgressBar.Parent = MainFrame
+ProgressBar.Size = UDim2.new(0.9, 0, 0, 15)
+ProgressBar.Position = UDim2.new(0.05, 0, 0.6, 0)
+ProgressBar.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+
+UICorner.Parent = ProgressBar
+UICorner.CornerRadius = UDim.new(0, 10)
+
+ProgressFill.Parent = ProgressBar
+ProgressFill.Size = UDim2.new(0, 0, 1, 0)
+ProgressFill.BackgroundColor3 = Color3.fromRGB(0, 122, 255)
+
+UICorner:Clone().Parent = ProgressFill
+
+-- 🔄 Hiệu ứng loading
+spawn(function()
+    for i = 1, 100 do
+        ProgressFill.Size = UDim2.new(i / 100, 0, 1, 0)
+        wait(0.05)
+    end
+end)
+
+-- 🕒 Load script chính
+task.spawn(function()
+    local success, err = pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Shade-vex/b/refs/heads/main/Aaa.txt"))()
+    end)
+
+    -- 🛑 Xóa GUI khi hoàn tất
+    if success then
+        TextLabel.Text = "✅ Tải thành công!"
+        wait(1)
+    else
+        TextLabel.Text = "❌ Lỗi: " .. err
+        warn("Lỗi khi tải script:", err)
+        wait(2)
+    end
+    ScreenGui:Destroy()
+end)
