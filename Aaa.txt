@@ -3,12 +3,12 @@ loadstring(game:HttpGet(("https://raw.githubusercontent.com/Shade-vex/shadevex/r
 
        local Window = MakeWindow({
          Hub = {
-         Title = "DZ HUB [betaV1]",
+         Title = "SLIME HUB [Premium]",
          Animation = "Youtuber: Rimuru HRB"
          },
         Key = {
         KeySystem = fasle,
-        Title = "DZ HUB [betaV1]",
+        Title = "SLIME HUB [Premium]",
         Description = "đăng kí cho Shade-Vex đi",
         KeyLink = "https://discord.gg/DmN8sE7Y",
         Keys = {"Premium_Key_29833z920j8"},
@@ -22,7 +22,7 @@ loadstring(game:HttpGet(("https://raw.githubusercontent.com/Shade-vex/shadevex/r
   })
 
        MinimizeButton({
-       Image = "http://www.roblox.com/asset/?id=94011781668645",
+       Image = "http://www.roblox.com/asset/?id=118137882113790",
        Size = {50, 50},
        Color = Color3.fromRGB(10, 10, 10),
        Corner = true,
