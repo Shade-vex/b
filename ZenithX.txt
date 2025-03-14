@@ -1,54 +1,39 @@
 local ZenithX = Instance.new("ScreenGui")
 local MainFrame = Instance.new("Frame")
-local KeyFrame = Instance.new("Frame")
-local ScriptFrame = Instance.new("Frame")
-local LogoButton = Instance.new("ImageButton")
+local MinimizeButton = Instance.new("ImageButton")
+local LinkBox = Instance.new("TextBox")
+local RunButton = Instance.new("TextButton")
 
--- Thiết lập GUI chính
+-- Kích hoạt GUI
 ZenithX.Name = "Zenith X"
 ZenithX.Parent = game.CoreGui
 
--- Main Frame (Chính)
+-- Tạo giao diện chính
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = ZenithX
 MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-MainFrame.Size = UDim2.new(0.3, 0, 0.4, 0)
-MainFrame.Position = UDim2.new(0.35, 0, 0.3, 0)
-MainFrame.Visible = false
+MainFrame.Size = UDim2.new(0.4, 0, 0.5, 0)
+MainFrame.Position = UDim2.new(0.3, 0, 0.25, 0)
+MainFrame.Visible = true
 
--- Khung nhập Key
-KeyFrame.Name = "KeyFrame"
-KeyFrame.Parent = ZenithX
-KeyFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-KeyFrame.Size = UDim2.new(0.25, 0, 0.2, 0)
-KeyFrame.Position = UDim2.new(0.375, 0, 0.4, 0)
-KeyFrame.Visible = true
+-- Tạo nút Minimize (có thể di chuyển)
+MinimizeButton.Name = "MinimizeButton"
+MinimizeButton.Parent = ZenithX
+MinimizeButton.Size = UDim2.new(0, 50, 0, 50)
+MinimizeButton.Position = UDim2.new(0.9, 0, 0.05, 0) 
+MinimizeButton.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+MinimizeButton.Image = "http://www.roblox.com/asset/?id=77937110017915"
 
--- Khung nhập Script
-ScriptFrame.Name = "ScriptFrame"
-ScriptFrame.Parent = MainFrame
-ScriptFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-ScriptFrame.Size = UDim2.new(1, 0, 0.8, 0)
-ScriptFrame.Position = UDim2.new(0, 0, 0.2, 0)
-
--- Nút Logo bật/tắt
-LogoButton.Name = "LogoButton"
-LogoButton.Parent = ZenithX
-LogoButton.Size = UDim2.new(0.1, 0, 0.1, 0)
-LogoButton.Position = UDim2.new(0.45, 0, 0, 10)
-LogoButton.BackgroundTransparency = 1
-LogoButton.Image = "rbxassetid://77937110017915" -- Thay bằng ID logo của bạn
-
--- Kéo thả logo
+-- Kéo thả nút Minimize
 local dragging, offset
-LogoButton.InputBegan:Connect(function(input)
+MinimizeButton.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
         dragging = true
-        offset = input.Position - LogoButton.AbsolutePosition
+        offset = input.Position - MinimizeButton.AbsolutePosition
     end
 end)
 
-LogoButton.InputEnded:Connect(function(input)
+MinimizeButton.InputEnded:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
         dragging = false
     end
@@ -56,77 +41,34 @@ end)
 
 game:GetService("UserInputService").InputChanged:Connect(function(input)
     if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-        LogoButton.Position = UDim2.new(0, input.Position.X - offset.X, 0, input.Position.Y - offset.Y)
+        MinimizeButton.Position = UDim2.new(0, input.Position.X - offset.X, 0, input.Position.Y - offset.Y)
     end
 end)
 
--- Chức năng bật/tắt GUI
-LogoButton.MouseButton1Click:Connect(function()
+-- Chức năng ẩn/hiện GUI
+MinimizeButton.MouseButton1Click:Connect(function()
     MainFrame.Visible = not MainFrame.Visible
 end)
 
--- Ô nhập key
-local KeyBox = Instance.new("TextBox")
-KeyBox.Parent = KeyFrame
-KeyBox.Size = UDim2.new(0.7, 0, 0.4, 0)
-KeyBox.Position = UDim2.new(0.15, 0, 0.3, 0)
-KeyBox.PlaceholderText = "Nhập Key tại đây..."
-KeyBox.Text = ""
-
--- Nút lấy key
-local GetKeyButton = Instance.new("TextButton")
-GetKeyButton.Parent = KeyFrame
-GetKeyButton.Size = UDim2.new(0.3, 0, 0.3, 0)
-GetKeyButton.Position = UDim2.new(0.05, 0, 0.75, 0)
-GetKeyButton.Text = "Lấy Key"
-
-GetKeyButton.MouseButton1Click:Connect(function()
-    setclipboard("https://your-key-site.com") -- Thay link lấy key tại đây
-end)
-
--- Nút kiểm tra key
-local CheckKeyButton = Instance.new("TextButton")
-CheckKeyButton.Parent = KeyFrame
-CheckKeyButton.Size = UDim2.new(0.3, 0, 0.3, 0)
-CheckKeyButton.Position = UDim2.new(0.65, 0, 0.75, 0)
-CheckKeyButton.Text = "Kiểm tra"
-
-CheckKeyButton.MouseButton1Click:Connect(function()
-    if KeyBox.Text == "ZenithX_VN" then
-        KeyFrame.Visible = false
-        MainFrame.Visible = true
-    else
-        KeyBox.Text = "Sai Key!"
-    end
-end)
-
--- Ô nhập script
-local ScriptBox = Instance.new("TextBox")
-ScriptBox.Parent = ScriptFrame
-ScriptBox.Size = UDim2.new(0.95, 0, 0.7, 0)
-ScriptBox.Position = UDim2.new(0.025, 0, 0.1, 0)
-ScriptBox.PlaceholderText = "Dán script của bạn vào đây..."
-ScriptBox.Text = ""
-ScriptBox.MultiLine = true
-ScriptBox.ClearTextOnFocus = false
+-- Ô nhập link script
+LinkBox.Parent = MainFrame
+LinkBox.Size = UDim2.new(0.8, 0, 0.2, 0)
+LinkBox.Position = UDim2.new(0.1, 0, 0.3, 0)
+LinkBox.PlaceholderText = "Nhập link script vào đây..."
+LinkBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+LinkBox.TextColor3 = Color3.fromRGB(0, 0, 0)
 
 -- Nút chạy script
-local RunButton = Instance.new("TextButton")
-RunButton.Parent = ScriptFrame
-RunButton.Size = UDim2.new(0.4, 0, 0.15, 0)
-RunButton.Position = UDim2.new(0.3, 0, 0.85, 0)
+RunButton.Parent = MainFrame
+RunButton.Size = UDim2.new(0.4, 0, 0.2, 0)
+RunButton.Position = UDim2.new(0.3, 0, 0.6, 0)
 RunButton.Text = "Chạy Script"
+RunButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 
+-- Chạy script từ link nhập vào
 RunButton.MouseButton1Click:Connect(function()
-    local scriptText = ScriptBox.Text
-    if scriptText and scriptText ~= "" then
-        local success, err = pcall(function()
-            loadstring(game:HttpGet(scriptText))()
-        end)
-        if not success then
-            ScriptBox.Text = "Lỗi script!"
-        end
-    else
-        ScriptBox.Text = "Dán script vào đây!"
+    local scriptURL = LinkBox.Text
+    if scriptURL ~= "" then
+        loadstring(game:HttpGet(scriptURL))()
     end
 end)
