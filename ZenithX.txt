@@ -1,0 +1,93 @@
+local ZenithX = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local ExecuteButton = Instance.new("TextButton")
+local ClearButton = Instance.new("TextButton")
+local ScriptBox = Instance.new("TextBox")
+local KeyButton = Instance.new("TextButton")
+local HideButton = Instance.new("ImageButton")
+
+--// Định dạng GUI
+ZenithX.Name = "Zenith X"
+ZenithX.Parent = game.CoreGui
+
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ZenithX
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.Size = UDim2.new(0, 300, 0, 200)
+MainFrame.Position = UDim2.new(0.35, 0, 0.3, 0)
+MainFrame.Visible = false
+
+ScriptBox.Name = "ScriptBox"
+ScriptBox.Parent = MainFrame
+ScriptBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+ScriptBox.Size = UDim2.new(0, 280, 0, 100)
+ScriptBox.Position = UDim2.new(0, 10, 0, 10)
+ScriptBox.Text = "Dán link script vào đây"
+
+ExecuteButton.Name = "ExecuteButton"
+ExecuteButton.Parent = MainFrame
+ExecuteButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+ExecuteButton.Size = UDim2.new(0, 120, 0, 30)
+ExecuteButton.Position = UDim2.new(0, 10, 0, 120)
+ExecuteButton.Text = "Chạy Script"
+
+ClearButton.Name = "ClearButton"
+ClearButton.Parent = MainFrame
+ClearButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+ClearButton.Size = UDim2.new(0, 120, 0, 30)
+ClearButton.Position = UDim2.new(0, 150, 0, 120)
+ClearButton.Text = "Xóa Script"
+
+KeyButton.Name = "KeyButton"
+KeyButton.Parent = MainFrame
+KeyButton.BackgroundColor3 = Color3.fromRGB(255, 165, 0)
+KeyButton.Size = UDim2.new(0, 280, 0, 30)
+KeyButton.Position = UDim2.new(0, 10, 0, 160)
+KeyButton.Text = "Nhận Key"
+
+HideButton.Name = "HideButton"
+HideButton.Parent = ZenithX
+HideButton.BackgroundTransparency = 1
+HideButton.Position = UDim2.new(0.05, 0, 0.05, 0)
+HideButton.Size = UDim2.new(0, 50, 0, 50)
+HideButton.Image = "rbxassetid://77937110017915"
+
+--// Hệ thống Key (Hết hạn sau 24h)
+local validKey = "ZenithX_1234"
+local keyExpireTime = os.time() + (24 * 60 * 60)
+
+KeyButton.MouseButton1Click:Connect(function()
+    local userKey = game:GetService("Players").LocalPlayer:FindFirstChild("UserKey")
+    if not userKey then
+        userKey = Instance.new("StringValue", game:GetService("Players").LocalPlayer)
+        userKey.Name = "UserKey"
+    end
+
+    if os.time() >= keyExpireTime then
+        validKey = "ZenithX_" .. math.random(1000, 9999)
+        keyExpireTime = os.time() + (24 * 60 * 60)
+    end
+
+    userKey.Value = validKey
+    KeyButton.Text = "Key của bạn: " .. validKey
+end)
+
+--// Chạy script
+ExecuteButton.MouseButton1Click:Connect(function()
+    local scriptText = ScriptBox.Text
+    if scriptText and scriptText ~= "" then
+        loadstring(game:HttpGet(scriptText))()
+    end
+end)
+
+--// Xóa script
+ClearButton.MouseButton1Click:Connect(function()
+    ScriptBox.Text = ""
+end)
+
+--// Bật/tắt GUI
+local guiVisible = false
+HideButton.MouseButton1Click:Connect(function()
+    guiVisible = not guiVisible
+    MainFrame.Visible = guiVisible
+end)
