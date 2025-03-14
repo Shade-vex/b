@@ -21,7 +21,7 @@ MainFrame.BorderColor3 = Color3.fromRGB(255, 255, 255)
 ProfileImage.Parent = MainFrame
 ProfileImage.Size = UDim2.new(0, 50, 0, 50)
 ProfileImage.Position = UDim2.new(0, 10, 0, 10)
-ProfileImage.Image = "rbxassetid://94011781668645"
+ProfileImage.Image = "rbxassetid://118137882113790"
 ProfileImage.BackgroundTransparency = 1
 
 TextLabel.Parent = MainFrame
