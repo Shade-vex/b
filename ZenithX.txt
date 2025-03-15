@@ -1,30 +1,51 @@
 local ZenithX = Instance.new("ScreenGui")
 local MainFrame = Instance.new("Frame")
+local CloseButton = Instance.new("TextButton")
 local MinimizeButton = Instance.new("ImageButton")
 local LinkBox = Instance.new("TextBox")
 local RunButton = Instance.new("TextButton")
+local ClearButton = Instance.new("TextButton")
 
 -- Kích hoạt GUI
-ZenithX.Name = "Zenith X"
+ZenithX.Name = "ZenithX"
 ZenithX.Parent = game.CoreGui
 
--- Tạo giao diện chính
+-- Giao diện chính (Toàn màn hình)
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = ZenithX
 MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-MainFrame.Size = UDim2.new(0.4, 0, 0.5, 0)
-MainFrame.Position = UDim2.new(0.3, 0, 0.25, 0)
-MainFrame.Visible = true
+MainFrame.Size = UDim2.new(1, 0, 1, 0)
+MainFrame.Position = UDim2.new(0, 0, 0, 0)
+MainFrame.Visible = false -- Mặc định ẩn
 
--- Tạo nút Minimize (có thể di chuyển)
+-- Nút đóng GUI
+CloseButton.Parent = ZenithX
+CloseButton.Size = UDim2.new(0, 50, 0, 50)
+CloseButton.Position = UDim2.new(0.9, 0, 0.05, 0)
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+CloseButton.Text = "X"
+CloseButton.Visible = false
+
+CloseButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = false
+    CloseButton.Visible = false
+    MinimizeButton.Visible = true
+end)
+
+-- Nút Minimize (Logo)
 MinimizeButton.Name = "MinimizeButton"
 MinimizeButton.Parent = ZenithX
-MinimizeButton.Size = UDim2.new(0, 50, 0, 50)
-MinimizeButton.Position = UDim2.new(0.9, 0, 0.05, 0) 
+MinimizeButton.Size = UDim2.new(0, 70, 0, 70)
+MinimizeButton.Position = UDim2.new(0.45, 0, 0, 10) -- Ở giữa trên cùng
 MinimizeButton.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
 MinimizeButton.Image = "http://www.roblox.com/asset/?id=77937110017915"
 
--- Kéo thả nút Minimize
+-- Hiệu ứng viền tím phát sáng
+local UIStroke = Instance.new("UIStroke", MinimizeButton)
+UIStroke.Color = Color3.fromRGB(180, 0, 255) -- Màu tím
+UIStroke.Thickness = 3
+
+-- Kéo thả logo
 local dragging, offset
 MinimizeButton.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -45,14 +66,16 @@ game:GetService("UserInputService").InputChanged:Connect(function(input)
     end
 end)
 
--- Chức năng ẩn/hiện GUI
+-- Nhấn vào logo thì hiện GUI, ẩn logo, hiện nút X
 MinimizeButton.MouseButton1Click:Connect(function()
-    MainFrame.Visible = not MainFrame.Visible
+    MainFrame.Visible = true
+    CloseButton.Visible = true
+    MinimizeButton.Visible = false
 end)
 
 -- Ô nhập link script
 LinkBox.Parent = MainFrame
-LinkBox.Size = UDim2.new(0.8, 0, 0.2, 0)
+LinkBox.Size = UDim2.new(0.8, 0, 0.1, 0)
 LinkBox.Position = UDim2.new(0.1, 0, 0.3, 0)
 LinkBox.PlaceholderText = "Nhập link script vào đây..."
 LinkBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -60,15 +83,27 @@ LinkBox.TextColor3 = Color3.fromRGB(0, 0, 0)
 
 -- Nút chạy script
 RunButton.Parent = MainFrame
-RunButton.Size = UDim2.new(0.4, 0, 0.2, 0)
-RunButton.Position = UDim2.new(0.3, 0, 0.6, 0)
+RunButton.Size = UDim2.new(0.3, 0, 0.1, 0)
+RunButton.Position = UDim2.new(0.1, 0, 0.5, 0)
 RunButton.Text = "Chạy Script"
-RunButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+RunButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
 
--- Chạy script từ link nhập vào
 RunButton.MouseButton1Click:Connect(function()
     local scriptURL = LinkBox.Text
-    if scriptURL ~= "" then
+    if scriptURL:match("^https?://") then
         loadstring(game:HttpGet(scriptURL))()
+    else
+        LinkBox.Text = "Chỉ hỗ trợ link hợp lệ!"
     end
+end)
+
+-- Nút xóa link
+ClearButton.Parent = MainFrame
+ClearButton.Size = UDim2.new(0.3, 0, 0.1, 0)
+ClearButton.Position = UDim2.new(0.6, 0, 0.5, 0)
+ClearButton.Text = "Xóa Link"
+ClearButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+
+ClearButton.MouseButton1Click:Connect(function()
+    LinkBox.Text = ""
 end)
