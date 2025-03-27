@@ -1,8 +1,8 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-   Name = "🔰 Example Script Hub | Game 🔰",
-   LoadingTitle = "🔰 Kzu hub [Premium] 🔰",
+   Name = "🔰 Kzu Hub | Game 🔰",
+   LoadingTitle = "🔰 Kzu hub [Free] 🔰",
    LoadingSubtitle = "by Kzu123",
    ConfigurationSaving = {
       Enabled = false,
@@ -16,13 +16,13 @@ local Window = Rayfield:CreateWindow({
    },
    KeySystem = true, -- Set this to true to use our key system
    KeySettings = {
-      Title = "Key | Youtube Hub",
-      Subtitle = "Key System",
-      Note = "Key In Discord Server",
+      Title = "Key | Kzu Hub",
+      Subtitle = "Nhập key tại đây.",
+      Note = "Key ở trong Discord",
       FileName = "YoutubeHubKey1", -- It is recommended to use something unique as other scripts using Rayfield may overwrite your key file
       SaveKey = false, -- The user's key will be saved, but if you change the key, they will be unable to use your script
       GrabKeyFromSite = true, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
-      Key = {"Kzu123"} -- List of keys that will be accepted by the system, can be RAW file links (pastebin, github etc) or simple strings ("hello","key22")
+      Key = {"Free_lvl3"} -- List of keys that will be accepted by the system, can be RAW file links (pastebin, github etc) or simple strings ("hello","key22")
    }
 })
 
@@ -30,8 +30,8 @@ local MainTab = Window:CreateTab("🏠MAIN", nil) -- Title, Image
 local MainSection = MainTab:CreateSection("Main")
 
 Rayfield:Notify({
-   Title = "You executed the script",
-   Content = "Like And Subcribe !",
+   Title = "Đã tải xong script",
+   Content = "Tác giả : Kzu123",
    Duration = 5,
    Image = 13047715178,
    Actions = { -- Notification Buttons
@@ -153,6 +153,150 @@ local Button3 = TPTab:CreateButton({
 })
 
 
+
+
+local PVP_Tab = Window:CreateTab("⚔️PVP", nil)
+
+
+-- Đảm bảo Tab PVP đã tồn tại
+if not PVP_Tab then
+    PVP_Tab = Window:CreateTab("⚔️PVP", nil) -- Nếu tab chưa có, tạo mới
+end
+
+-- Cài đặt mặc định cho AimBot
+getgenv().setting = {
+    Fov = 50,
+    Color = Color3.fromRGB(191, 255, 209),
+    LockPlayers = false,
+    LockPlayersBind = Enum.KeyCode.L,
+    resetPlayersBind = Enum.KeyCode.P,
+}
+
+local Playersaimbot = nil
+local mouse = game.Players.LocalPlayer:GetMouse()
+local guiservice = game:GetService("GuiService")
+local players = game:GetService("Players")
+local localPlayer = players.LocalPlayer
+local currentCamera = game:GetService("Workspace").CurrentCamera
+local circle = Drawing.new("Circle")
+local AimBotEnabled = false
+
+-- Hiển thị thông báo khi bật AimBot
+local function showAimBotNotification()
+    local gui = Instance.new("ScreenGui")
+    gui.Parent = game.Players.LocalPlayer:FindFirstChildOfClass("PlayerGui") or game.CoreGui
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(0, 300, 0, 50)
+    label.Position = UDim2.new(0.5, -150, 0.4, 0)
+    label.BackgroundTransparency = 1
+    label.TextColor3 = Color3.new(0, 255, 0)
+    label.TextStrokeTransparency = 0
+    label.TextStrokeColor3 = Color3.new(0, 0, 0)
+    label.TextScaled = true
+    label.Font = Enum.Font.SourceSansBold
+    label.Text = "Kzu Hub Aim [Free]"
+    label.Parent = gui
+
+    spawn(function()
+        wait(3)
+        label:Destroy()
+        gui:Destroy()
+    end)
+end
+
+-- Vòng tròn AimBot
+function updateCircle(Fov, colorCircle)
+    if circle.__OBJECT_EXISTS then
+        circle.Transparency = 1
+        circle.Visible = true
+        circle.Thickness = 2
+        circle.Color = colorCircle
+        circle.NumSides = 100
+        circle.Radius = (Fov * 6) / 2
+        circle.Filled = false
+        circle.Position = Vector2.new(mouse.X, mouse.Y + (guiservice:GetGuiInset().Y))
+    end
+end
+
+-- Theo dõi vị trí kẻ địch trong phạm vi FOV
+spawn(function()
+    game:GetService("RunService").RenderStepped:Connect(function()
+        if AimBotEnabled then
+            pcall(function()
+                updateCircle(getgenv().setting.Fov, getgenv().setting.Color)
+            end)
+        else
+            circle.Visible = false
+        end
+    end)
+end)
+
+-- Xác định mục tiêu
+spawn(function()
+    while wait() do
+        if AimBotEnabled then
+            for _, v in pairs(players:GetPlayers()) do
+                if v ~= localPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                    local pos = currentCamera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
+                    local magnitude = (Vector2.new(pos.X, pos.Y) - Vector2.new(mouse.X, mouse.Y)).Magnitude
+                    if magnitude < (getgenv().setting.Fov * 6 - 8) / 2 then
+                        if (v.Character.HumanoidRootPart.Position - localPlayer.Character.HumanoidRootPart.Position).Magnitude <= 1000 then
+                            if getgenv().setting.LockPlayers == false then
+                                Playersaimbot = v.Name
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end)
+
+-- Hook vào RemoteEvent để tự động nhắm
+spawn(function()
+    local gg = getrawmetatable(game)
+    local old = gg.__namecall
+    setreadonly(gg, false)
+    gg.__namecall = newcclosure(function(...)
+        local method = getnamecallmethod()
+        local args = { ... }
+        if tostring(method) == "FireServer" and tostring(args[1]) == "RemoteEvent" then
+            if AimBotEnabled and Playersaimbot then
+                args[2] = players:FindFirstChild(Playersaimbot).Character.HumanoidRootPart.Position
+                return old(unpack(args))
+            end
+        end
+        return old(...)
+    end)
+end)
+
+-- Điều khiển bật/tắt AimBot bằng phím
+game:GetService("UserInputService").InputBegan:Connect(function(io, p)
+    if io.KeyCode == getgenv().setting.LockPlayersBind then
+        AimBotEnabled = not AimBotEnabled
+        if AimBotEnabled then
+            showAimBotNotification()
+        end
+    end
+    if io.KeyCode == getgenv().setting.resetPlayersBind then
+        Playersaimbot = nil
+        print("Reset AimBot Target")
+    end
+end)
+
+-- **Thêm Toggle vào PVP Tab**
+local ToggleAimbot = PVP_Tab:CreateToggle({
+    Name = "Aimbot Skill [Free]",
+    CurrentValue = false,
+    Flag = "ToggleAimbot",
+    Callback = function(Value)
+        AimBotEnabled = Value
+        if AimBotEnabled then
+            showAimBotNotification()
+        end
+    end,
+})
 
 
 local espEnabled = false -- Trạng thái bật/tắt ESP
