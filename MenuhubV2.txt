@@ -289,6 +289,129 @@ local ToggleAimbot = PVP_Tab:CreateToggle({
 })
 
 
+
+
+
+-- Đảm bảo Tab PVP đã tồn tại
+if not PVP_Tab then
+    PVP_Tab = Window:CreateTab("⚔️PVP", nil) -- Nếu tab chưa có, tạo mới
+end
+
+local hitboxEnabled = false  -- Biến để bật/tắt hitbox
+local hitboxSize = Vector3.new(70, 70, 70)  -- Kích thước hitbox x70
+local transparency = 0.5  -- Độ trong suốt của hitbox (0 là không trong suốt, 1 là vô hình)
+local hitboxLoopRunning = false  -- Biến kiểm soát vòng lặp kiểm tra hitbox
+
+-- Hàm chỉnh hitbox của người chơi khác
+local function setHitbox(player)
+    if player == game.Players.LocalPlayer then return end  
+    local character = player.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        local rootPart = character.HumanoidRootPart
+        rootPart.Size = hitboxSize
+        rootPart.Transparency = transparency
+        rootPart.CanCollide = false
+    end
+end
+
+-- Kiểm tra và cập nhật hitbox cho tất cả người chơi
+local function checkAndSetHitboxes()
+    if hitboxEnabled then
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player.Character then
+                setHitbox(player)
+            end
+        end
+    end
+end
+
+-- Hiển thị chữ bảy màu khi bật hitbox
+local function showRainbowText()
+    local gui = Instance.new("ScreenGui", game.Players.LocalPlayer.PlayerGui)
+    local label = Instance.new("TextLabel", gui)
+
+    label.Size = UDim2.new(0.4, 0, 0.1, 0)
+    label.Position = UDim2.new(0.3, 0, 0.4, 0)
+    label.Text = "Kzu hub Hitbox"
+    label.Font = Enum.Font.SourceSansBold
+    label.TextScaled = true
+    label.BackgroundTransparency = 1
+    label.TextStrokeTransparency = 0
+    label.TextColor3 = Color3.new(1, 0, 0)
+
+    local colors = {
+        Color3.new(1, 0, 0),  Color3.new(1, 0.5, 0),
+        Color3.new(1, 1, 0),  Color3.new(0, 1, 0),
+        Color3.new(0, 1, 1),  Color3.new(0, 0, 1),
+        Color3.new(0.5, 0, 1)
+    }
+
+    task.spawn(function()
+        for i = 1, 30 do
+            label.TextColor3 = colors[(i % #colors) + 1]
+            wait(0.1)
+        end
+        gui:Destroy()
+    end)
+end
+
+-- Hàm bật/tắt hitbox
+local function toggleHitbox()
+    hitboxEnabled = not hitboxEnabled
+    if hitboxEnabled then
+        checkAndSetHitboxes()
+
+        game.Players.PlayerAdded:Connect(function(player)
+            player.CharacterAdded:Connect(function()
+                wait(3)
+                setHitbox(player)
+            end)
+        end)
+
+        game.Players.PlayerAdded:Connect(function(player)
+            player.CharacterAdded:Connect(function()
+                wait(3)
+                setHitbox(player)
+            end)
+        end)
+
+        showRainbowText()
+
+        hitboxLoopRunning = true
+        while hitboxLoopRunning do
+            wait(1)
+            checkAndSetHitboxes()
+        end
+    else
+        hitboxLoopRunning = false
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player ~= game.Players.LocalPlayer then
+                local character = player.Character
+                if character and character:FindFirstChild("HumanoidRootPart") then
+                    local rootPart = character.HumanoidRootPart
+                    rootPart.Size = Vector3.new(2, 2, 1)
+                    rootPart.Transparency = 0
+                end
+            end
+        end
+    end
+end
+
+-- **Thay thế nút cũ bằng Toggle mới trong Tab PVP**
+local ToggleHitbox = PVP_Tab:CreateToggle({
+    Name = "Super Hitbox",
+    CurrentValue = false,
+    Flag = "ToggleHitbox",
+    Callback = function(Value)
+        toggleHitbox()
+    end,
+})
+
+
+
+
+
+
 local espEnabled = false -- Trạng thái bật/tắt ESP
 local connections = {} -- Lưu các kết nối để ngắt khi cần
 
