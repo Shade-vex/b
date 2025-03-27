@@ -157,7 +157,6 @@ local Button3 = TPTab:CreateButton({
 
 local PVP_Tab = Window:CreateTab("⚔️PVP", nil)
 
-
 -- Đảm bảo Tab PVP đã tồn tại
 if not PVP_Tab then
     PVP_Tab = Window:CreateTab("⚔️PVP", nil) -- Nếu tab chưa có, tạo mới
@@ -174,7 +173,6 @@ getgenv().setting = {
 
 local Playersaimbot = nil
 local mouse = game.Players.LocalPlayer:GetMouse()
-local guiservice = game:GetService("GuiService")
 local players = game:GetService("Players")
 local localPlayer = players.LocalPlayer
 local currentCamera = game:GetService("Workspace").CurrentCamera
@@ -195,7 +193,7 @@ local function showAimBotNotification()
     label.TextStrokeColor3 = Color3.new(0, 0, 0)
     label.TextScaled = true
     label.Font = Enum.Font.SourceSansBold
-    label.Text = "Kzu Hub Aim [Free]"
+    label.Text = "Kzu Hub Aim [free]"
     label.Parent = gui
 
     spawn(function()
@@ -205,32 +203,22 @@ local function showAimBotNotification()
     end)
 end
 
--- Vòng tròn AimBot
-function updateCircle(Fov, colorCircle)
-    if circle.__OBJECT_EXISTS then
-        circle.Transparency = 1
-        circle.Visible = true
-        circle.Thickness = 2
-        circle.Color = colorCircle
-        circle.NumSides = 100
-        circle.Radius = (Fov * 6) / 2
-        circle.Filled = false
-        circle.Position = Vector2.new(mouse.X, mouse.Y + (guiservice:GetGuiInset().Y))
-    end
-end
+-- Hiển thị vòng tròn trong 1 giây rồi ẩn đi
+function showCircleOnce()
+    circle.Transparency = 1
+    circle.Visible = true
+    circle.Thickness = 2
+    circle.Color = getgenv().setting.Color
+    circle.NumSides = 100
+    circle.Radius = (getgenv().setting.Fov * 6) / 2
+    circle.Filled = false
+    circle.Position = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y / 2)
 
--- Theo dõi vị trí kẻ địch trong phạm vi FOV
-spawn(function()
-    game:GetService("RunService").RenderStepped:Connect(function()
-        if AimBotEnabled then
-            pcall(function()
-                updateCircle(getgenv().setting.Fov, getgenv().setting.Color)
-            end)
-        else
-            circle.Visible = false
-        end
+    spawn(function()
+        wait(1) -- Ẩn vòng tròn sau 1 giây
+        circle.Visible = false
     end)
-end)
+end
 
 -- Xác định mục tiêu
 spawn(function()
@@ -242,7 +230,7 @@ spawn(function()
                     local magnitude = (Vector2.new(pos.X, pos.Y) - Vector2.new(mouse.X, mouse.Y)).Magnitude
                     if magnitude < (getgenv().setting.Fov * 6 - 8) / 2 then
                         if (v.Character.HumanoidRootPart.Position - localPlayer.Character.HumanoidRootPart.Position).Magnitude <= 1000 then
-                            if getgenv().setting.LockPlayers == false then
+                            if not getgenv().setting.LockPlayers then
                                 Playersaimbot = v.Name
                             end
                         end
@@ -277,6 +265,7 @@ game:GetService("UserInputService").InputBegan:Connect(function(io, p)
         AimBotEnabled = not AimBotEnabled
         if AimBotEnabled then
             showAimBotNotification()
+            showCircleOnce() -- Gọi hàm hiển thị vòng tròn trong 1 giây
         end
     end
     if io.KeyCode == getgenv().setting.resetPlayersBind then
@@ -287,13 +276,14 @@ end)
 
 -- **Thêm Toggle vào PVP Tab**
 local ToggleAimbot = PVP_Tab:CreateToggle({
-    Name = "Aimbot Skill [Free]",
+    Name = "Aimbot Skill",
     CurrentValue = false,
     Flag = "ToggleAimbot",
     Callback = function(Value)
         AimBotEnabled = Value
         if AimBotEnabled then
             showAimBotNotification()
+            showCircleOnce() -- Gọi hàm hiển thị vòng tròn trong 1 giây
         end
     end,
 })
@@ -544,7 +534,3 @@ local Toggle = ESP_Tab:CreateToggle({
 
 
 local TPTab = Window:CreateTab("🎲 Misc", nil) -- Title, Image
-   
-
-
-       
