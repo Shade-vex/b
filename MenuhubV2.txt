@@ -156,12 +156,12 @@ local Button3 = TPTab:CreateButton({
 
 local TPTab = Window:CreateTab("🔥ESP", nil) -- Title, Image
 
-local ESP_Toggle = CreateTab:CreateToggle({
-    Name = "ESP PLAYER",
-    CurrentValue = false,
-    Flag = "ESP_Toggle",
-    Callback = function(Value)
-        espEnabled = Value -- Cập nhật trạng thái ESP
+local Toggle = CreateTab:CreateToggle({
+   Name = "ESP PLAYER",
+   CurrentValue = false,
+   Flag = "ESP_Toggle",  -- Đảm bảo flag này là duy nhất và không trùng lặp
+   Callback = function(Value)
+        espEnabled = Value -- Cập nhật trạng thái bật/tắt ESP
 
         if espEnabled then
             -- Thêm ESP cho tất cả người chơi hiện tại
@@ -193,7 +193,7 @@ local ESP_Toggle = CreateTab:CreateToggle({
             end
             connections = {}
         end
-    end,
+   end,
 })
 
 local TPTab = Window:CreateTab("🎲 Misc", nil) -- Title, Image
