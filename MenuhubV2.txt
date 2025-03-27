@@ -657,93 +657,79 @@ local Toggle = ESP_Tab:CreateToggle({
 local Hop_Tab = Window:CreateTab("🎭Server hop", nil)
 
 
+local function checkFullMoon()
+    local logs = game:GetService("LogService"):GetLogHistory()
+    local currentTime = tick()
 
-local FullMoonButton = Hop_Tab:CreateButton({
-   Name = "Tìm Full Moon",
-   Callback = function()
-        FindFullMoonServer()
-   end,
-})
-
-function FindFullMoonServer()
-    local HttpService = game:GetService("HttpService")
-    local Players = game:GetService("Players")
-    local LocalPlayer = Players.LocalPlayer
-    local MaxRetries = 10  -- Số lần thử tối đa để tìm server phù hợp
-
-    -- Kiểm tra thông báo server trong 15 phút gần nhất
-    local function CheckRecentMessages()
-        local logs = game:GetService("LogService"):GetLogHistory()
-        for _, log in ipairs(logs) do
-            if string.find(log.message, "Full Moon") and tick() - log.timestamp < 900 then
-                return true  -- Nếu có Full Moon trong 15 phút trước, không hop
+    for _, log in pairs(logs) do
+        if log.message:lower():find("full moon") then
+            local timeDiff = currentTime - log.timestamp
+            if timeDiff <= 900 then  -- 900 giây = 15 phút
+                return true  -- Đã có Full Moon trong 15 phút gần nhất
             end
         end
-        return false
     end
+    return false
+end
 
-    if CheckRecentMessages() then
-        ShowCustomNotification("Full Moon đã xuất hiện", "Không cần hop server!", Color3.new(1, 1, 0)) -- Màu vàng
+local function findServer()
+    local HttpService = game:GetService("HttpService")
+    local servers = HttpService:GetAsync("https://games.roblox.com/v1/games/2753915549/servers/Public?sortOrder=Asc&limit=100")
+    local data = HttpService:JSONDecode(servers)
+
+    for _, server in pairs(data.data) do
+        if server.playing >= 8 and server.playing <= 11 then
+            return server.id
+        end
+    end
+    return nil
+end
+
+local function teleportToServer(serverId)
+    game:GetService("TeleportService"):TeleportToPlaceInstance(2753915549, serverId, game.Players.LocalPlayer)
+end
+
+local function showNotification(text)
+    local gui = Instance.new("ScreenGui", game.Players.LocalPlayer.PlayerGui)
+    local frame = Instance.new("Frame", gui)
+    local label = Instance.new("TextLabel", frame)
+
+    frame.Size = UDim2.new(0.25, 0, 0.1, 0)
+    frame.Position = UDim2.new(0.75, 0, 0.9, 0)
+    frame.BackgroundTransparency = 0.3
+    frame.BackgroundColor3 = Color3.new(0, 0, 0)
+
+    label.Size = UDim2.new(1, 0, 1, 0)
+    label.Text = text
+    label.Font = Enum.Font.SourceSansBold
+    label.TextScaled = true
+    label.TextColor3 = Color3.new(1, 1, 1)
+    label.BackgroundTransparency = 1
+
+    wait(3)
+    gui:Destroy()
+end
+
+local function TeleportFullMoon()
+    if checkFullMoon() then
+        showNotification("Không tìm thấy server có Full Moon")
         return
     end
 
-    -- Tìm server phù hợp
-    for i = 1, MaxRetries do
-        local Servers = HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/2753915549/servers/Public?sortOrder=Asc&limit=100"))
-        for _, server in ipairs(Servers.data) do
-            if server.playing >= 8 and server.playing <= 11 and server.id ~= game.JobId then
-                ShowCustomNotification("Đang chuyển server", "Tìm thấy server Full Moon, đang vào...", Color3.new(0, 1, 0)) -- Màu xanh lá
-                wait(1)
-                game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, server.id, LocalPlayer)
-                return
-            end
-        end
-        wait(2) -- Chờ trước khi thử lại
+    local serverId = findServer()
+    if serverId then
+        teleportToServer(serverId)
+    else
+        showNotification("Không tìm thấy server phù hợp")
     end
-
-    -- Nếu không tìm thấy server
-    ShowCustomNotification("Không tìm thấy Server!", "Không tìm thấy Full Moon sau 10 lần thử.", Color3.new(1, 0, 0)) -- Màu đỏ
 end
 
--- Hàm tạo GUI giống thông báo thành tựu / Azure Hub
-function ShowCustomNotification(title, message, color)
-    local ScreenGui = Instance.new("ScreenGui", game.Players.LocalPlayer:WaitForChild("PlayerGui"))
-    local Frame = Instance.new("Frame", ScreenGui)
-    local TitleLabel = Instance.new("TextLabel", Frame)
-    local MessageLabel = Instance.new("TextLabel", Frame)
-
-    -- Thiết lập GUI chính
-    ScreenGui.ResetOnSpawn = false
-    Frame.Size = UDim2.new(0, 350, 0, 120)
-    Frame.Position = UDim2.new(0.5, -175, 0.2, 0)
-    Frame.BackgroundColor3 = color
-    Frame.BackgroundTransparency = 0.2
-    Frame.BorderSizePixel = 2
-    Frame.BorderColor3 = Color3.new(0, 0, 0)
-
-    -- Thiết lập tiêu đề
-    TitleLabel.Size = UDim2.new(1, 0, 0.3, 0)
-    TitleLabel.Position = UDim2.new(0, 0, 0, 10)
-    TitleLabel.Text = title
-    TitleLabel.Font = Enum.Font.SourceSansBold
-    TitleLabel.TextSize = 22
-    TitleLabel.TextColor3 = Color3.new(1, 1, 1)
-    TitleLabel.BackgroundTransparency = 1
-
-    -- Thiết lập nội dung
-    MessageLabel.Size = UDim2.new(1, -20, 0.5, 0)
-    MessageLabel.Position = UDim2.new(0, 10, 0.4, 0)
-    MessageLabel.Text = message
-    MessageLabel.Font = Enum.Font.SourceSans
-    MessageLabel.TextSize = 18
-    MessageLabel.TextColor3 = Color3.new(1, 1, 1)
-    MessageLabel.BackgroundTransparency = 1
-    MessageLabel.TextWrapped = true
-
-    -- Tự động ẩn GUI sau 4 giây
-    wait(4)
-    ScreenGui:Destroy()
-end
+local Button4 = Hop_Tab:CreateButton({
+    Name = "Tìm Server Full Moon",
+    Callback = function()
+        TeleportFullMoon()
+    end,
+})
 
 
 
