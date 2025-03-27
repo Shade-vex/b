@@ -26,7 +26,7 @@ local Window = Rayfield:CreateWindow({
    }
 })
 
-local MainTab = Window:CreateTab("MAIN", nil) -- Title, Image
+local MainTab = Window:CreateTab("🏠MAIN", nil) -- Title, Image
 local MainSection = MainTab:CreateSection("Main")
 
 Rayfield:Notify({
@@ -262,6 +262,73 @@ local Toggle = ESP_Tab:CreateToggle({
 })
 
 local TPTab = Window:CreateTab("🎲 Misc", nil) -- Title, Image
-       
-                
+   
+
+-- Đảm bảo bạn đã có TPTab từ trước rồi
+local TPTab = Window:CreateTab("🎲 Misc", nil)
+
+-- Khai báo biến
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local bodyVelocity = nil
+local wallHackEnabled = false
+
+-- Hàm bật xuyên tường
+local function enableWallHack()
+    -- Dừng mọi hành động va chạm
+    for _, part in pairs(character:GetChildren()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = false
+        end
+    end
+    
+    -- Cài đặt BodyVelocity cho di chuyển mượt mà
+    if not bodyVelocity then
+        bodyVelocity = Instance.new("BodyVelocity")
+        bodyVelocity.MaxForce = Vector3.new(100000, 100000, 100000)
+        bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+        bodyVelocity.Parent = character:WaitForChild("HumanoidRootPart")
+    end
+
+    -- Thay đổi tốc độ di chuyển (tùy chỉnh theo ý muốn)
+    bodyVelocity.Velocity = humanoid.MoveDirection * 100
+end
+
+-- Hàm tắt xuyên tường
+local function disableWallHack()
+    -- Kích hoạt lại va chạm cho tất cả các phần của nhân vật
+    for _, part in pairs(character:GetChildren()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = true
+        end
+    end
+    
+    -- Dừng BodyVelocity
+    if bodyVelocity then
+        bodyVelocity:Destroy()
+        bodyVelocity = nil
+    end
+end
+
+-- Hàm bật/tắt xuyên tường khi người dùng nhấn Toggle
+local function toggleWallHack(value)
+    wallHackEnabled = value
+
+    if wallHackEnabled then
+        enableWallHack()
+    else
+        disableWallHack()
+    end
+end
+
+-- Tạo nút Toggle trong Tab "🎲 Misc" để bật/tắt xuyên tường
+local WallHackToggle = TPTab:CreateToggle({
+   Name = "Wall Hack",
+   CurrentValue = false,
+   Flag = "WallHackToggle",  -- Lưu cài đặt của người dùng
+   Callback = function(Value)
+        toggleWallHack(Value)  -- Gọi hàm bật/tắt khi toggle thay đổi
+   end,
+})
        
