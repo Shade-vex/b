@@ -152,6 +152,50 @@ local Button3 = TPTab:CreateButton({
    end,
 })
 
+
+
+local TPTab = Window:CreateTab("🔥ESP", nil) -- Title, Image
+
+local ESP_Toggle = CreateTab:CreateToggle({
+    Name = "ESP PLAYER",
+    CurrentValue = false,
+    Flag = "ESP_Toggle",
+    Callback = function(Value)
+        espEnabled = Value -- Cập nhật trạng thái ESP
+
+        if espEnabled then
+            -- Thêm ESP cho tất cả người chơi hiện tại
+            for _, player in pairs(game.Players:GetPlayers()) do
+                if player ~= game.Players.LocalPlayer then
+                    createESP(player)
+                end
+            end
+
+            -- Lắng nghe người chơi mới tham gia
+            connections["PlayerAdded"] = game.Players.PlayerAdded:Connect(function(player)
+                if espEnabled then createESP(player) end
+            end)
+        else
+            -- Xóa toàn bộ ESP khi tắt
+            for _, player in pairs(game.Players:GetPlayers()) do
+                if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                    for _, gui in pairs(player.Character.HumanoidRootPart:GetChildren()) do
+                        if gui:IsA("BillboardGui") then gui:Destroy() end
+                    end
+                end
+            end
+
+            -- Ngắt tất cả kết nối
+            for _, conn in pairs(connections) do
+                if conn and typeof(conn) == "RBXScriptConnection" then
+                    conn:Disconnect()
+                end
+            end
+            connections = {}
+        end
+    end,
+})
+
 local TPTab = Window:CreateTab("🎲 Misc", nil) -- Title, Image
        
                 
