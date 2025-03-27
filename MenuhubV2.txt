@@ -154,45 +154,110 @@ local Button3 = TPTab:CreateButton({
 
 
 
-local TPTab = Window:CreateTab("🔥ESP", nil) -- Title, Image
 
-local Toggle = CreateTab:CreateToggle({
+local espEnabled = false -- Trạng thái bật/tắt ESP
+local connections = {} -- Lưu các kết nối để ngắt khi cần
+
+local function createESP(player)
+    if player == game.Players.LocalPlayer then return end -- Không hiển thị bản thân
+
+    local function updateESP()
+        local character = player.Character
+        if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+
+        local billboard = Instance.new("BillboardGui")
+        billboard.Adornee = character.HumanoidRootPart
+        billboard.Size = UDim2.new(0, 200, 0, 50)
+        billboard.StudsOffset = Vector3.new(0, 3, 0)
+        billboard.AlwaysOnTop = true
+
+        local textLabel = Instance.new("TextLabel", billboard)
+        textLabel.Size = UDim2.new(1, 0, 1, 0)
+        textLabel.BackgroundTransparency = 1
+        textLabel.TextColor3 = Color3.new(0, 255, 0) -- Màu xanh lá
+        textLabel.TextScaled = false
+        textLabel.TextSize = 20
+        textLabel.Font = Enum.Font.SourceSansBold
+        textLabel.TextStrokeTransparency = 0.2
+        billboard.Parent = character.HumanoidRootPart
+
+        -- Cập nhật vị trí & giữ nguyên kích thước theo khoảng cách
+        spawn(function()
+            while espEnabled and character and character:FindFirstChild("Humanoid") and character:FindFirstChild("HumanoidRootPart") do
+                local humanoid = character:FindFirstChild("Humanoid")
+                local localPlayer = game.Players.LocalPlayer
+                if localPlayer and localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                    local distance = (localPlayer.Character.HumanoidRootPart.Position - character.HumanoidRootPart.Position).Magnitude
+                    local size = 15
+                    billboard.Size = UDim2.new(0, size * 10, 0, size * 2)
+                    textLabel.Text = string.format("[%s] HP: %d | %dm", player.Name, math.floor(humanoid.Health), math.floor(distance))
+                end
+                wait(0.1)
+            end
+            billboard:Destroy()
+        end)
+    end
+
+    -- Gán ESP khi nhân vật mới spawn
+    if not connections[player] then
+        connections[player] = player.CharacterAdded:Connect(function()
+            if espEnabled then
+                wait(1) -- Đợi nhân vật load xong
+                updateESP()
+            end
+        end)
+    end
+
+    -- Nếu nhân vật đã tồn tại, tạo ESP luôn
+    if player.Character then
+        updateESP()
+    end
+end
+
+-- Hàm bật/tắt ESP
+local function toggleESP(Value)
+    espEnabled = Value -- Trạng thái toggle sẽ quyết định bật/tắt ESP
+
+    if espEnabled then
+        -- Thêm ESP cho tất cả người chơi hiện tại
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player ~= game.Players.LocalPlayer then
+                createESP(player)
+            end
+        end
+
+        -- Lắng nghe người chơi mới tham gia
+        connections["PlayerAdded"] = game.Players.PlayerAdded:Connect(function(player)
+            if espEnabled then createESP(player) end
+        end)
+    else
+        -- Xóa toàn bộ ESP khi tắt
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                for _, gui in pairs(player.Character.HumanoidRootPart:GetChildren()) do
+                    if gui:IsA("BillboardGui") then gui:Destroy() end
+                end
+            end
+        end
+
+        -- Ngắt tất cả kết nối
+        for _, conn in pairs(connections) do
+            if conn and typeof(conn) == "RBXScriptConnection" then
+                conn:Disconnect()
+            end
+        end
+        connections = {}
+    end
+end
+
+-- Tạo Tab và Toggle để bật/tắt ESP
+local ESP_Tab = Window:CreateTab("🔥ESP", nil)  -- Tạo Tab 
+local Toggle = ESP_Tab:CreateToggle({
    Name = "ESP PLAYER",
    CurrentValue = false,
-   Flag = "ESP_Toggle",  -- Đảm bảo flag này là duy nhất và không trùng lặp
+   Flag = "ESP_Toggle",  -- Cờ lưu trữ trạng thái toggle
    Callback = function(Value)
-        espEnabled = Value -- Cập nhật trạng thái bật/tắt ESP
-
-        if espEnabled then
-            -- Thêm ESP cho tất cả người chơi hiện tại
-            for _, player in pairs(game.Players:GetPlayers()) do
-                if player ~= game.Players.LocalPlayer then
-                    createESP(player)
-                end
-            end
-
-            -- Lắng nghe người chơi mới tham gia
-            connections["PlayerAdded"] = game.Players.PlayerAdded:Connect(function(player)
-                if espEnabled then createESP(player) end
-            end)
-        else
-            -- Xóa toàn bộ ESP khi tắt
-            for _, player in pairs(game.Players:GetPlayers()) do
-                if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                    for _, gui in pairs(player.Character.HumanoidRootPart:GetChildren()) do
-                        if gui:IsA("BillboardGui") then gui:Destroy() end
-                    end
-                end
-            end
-
-            -- Ngắt tất cả kết nối
-            for _, conn in pairs(connections) do
-                if conn and typeof(conn) == "RBXScriptConnection" then
-                    conn:Disconnect()
-                end
-            end
-            connections = {}
-        end
+        toggleESP(Value)  -- Gọi hàm bật/tắt ESP khi toggle thay đổi
    end,
 })
 
