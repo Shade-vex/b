@@ -292,6 +292,120 @@ local ToggleAimbot = PVP_Tab:CreateToggle({
 
 
 
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Camera = game.Workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+
+local camLockEnabled = false
+local lockedPlayer = nil
+
+local function getLookedAtPlayer()
+    local mouse = LocalPlayer:GetMouse()
+    local target = mouse.Target
+    
+    if target and target.Parent then
+        local character = target.Parent
+        local player = Players:GetPlayerFromCharacter(character)
+        if player and player ~= LocalPlayer then
+            return player
+        end
+    end
+    return nil
+end
+
+local function lockCameraOnPlayer(player)
+    if not player or not player.Character then return end
+    local rootPart = player.Character:FindFirstChild("HumanoidRootPart")
+    
+    if rootPart then
+        Camera.CameraType = Enum.CameraType.Scriptable
+        RunService.RenderStepped:Connect(function()
+            if camLockEnabled and lockedPlayer == player then
+                Camera.CFrame = CFrame.new(Camera.CFrame.Position, rootPart.Position)
+            end
+        end)
+    end
+end
+
+local function toggleCamLock()
+    camLockEnabled = not camLockEnabled
+
+    if camLockEnabled then
+        local targetPlayer = getLookedAtPlayer()
+        if targetPlayer then
+            lockedPlayer = targetPlayer
+            lockCameraOnPlayer(lockedPlayer)
+            
+            -- Hiển thị thông báo
+            Rayfield:Notify({
+                Title = "Cam Lock Bật",
+                Content = "Đang cam lock: " .. lockedPlayer.Name,
+                Duration = 5,
+                Image = 13047715178,
+                Actions = {
+                    Ignore = {
+                        Name = "Okay!",
+                        Callback = function()
+                            print("Cam lock đã bật")
+                        end
+                    }
+                },
+            })
+        else
+            camLockEnabled = false
+            Rayfield:Notify({
+                Title = "Cam Lock Thất Bại",
+                Content = "Hãy nhìn vào một người chơi trước!",
+                Duration = 5,
+                Image = 13047715178,
+                Actions = {
+                    Ignore = {
+                        Name = "Okay!",
+                        Callback = function()
+                            print("Không tìm thấy người chơi")
+                        end
+                    }
+                },
+            })
+        end
+    else
+        Camera.CameraType = Enum.CameraType.Custom
+        lockedPlayer = nil
+        Rayfield:Notify({
+            Title = "Cam Lock Tắt",
+            Content = "Đã tắt cam lock!",
+            Duration = 5,
+            Image = 13047715178,
+            Actions = {
+                Ignore = {
+                    Name = "Okay!",
+                    Callback = function()
+                        print("Cam lock đã tắt")
+                    end
+                }
+            },
+        })
+    end
+end
+
+-- Tạo nút bật/tắt cam lock
+local Toggle = PVP_Tab:CreateToggle({
+    Name = "Camlock Player",
+    CurrentValue = false,
+    Flag = "Camlock",
+    Callback = function(Value)
+        toggleCamLock()
+    end,
+})
+
+
+
+
+
+
+
 -- Đảm bảo Tab PVP đã tồn tại
 if not PVP_Tab then
     PVP_Tab = Window:CreateTab("⚔️PVP", nil) -- Nếu tab chưa có, tạo mới
