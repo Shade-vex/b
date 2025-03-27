@@ -661,30 +661,29 @@ local HttpService = game:GetService("HttpService")
 local TeleportService = game:GetService("TeleportService")
 local PlaceId = game.PlaceId
 
--- Hàm tìm và đổi server với điều kiện số người chơi từ 7-11
 local function switchServer()
     local success, servers = pcall(function()
         return HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"))
     end)
 
-    if success and servers and servers.data then
-        for _, server in pairs(servers.data) do
-            if server.id ~= game.JobId and server.playing >= 7 and server.playing <= 11 and server.playing < server.maxPlayers then
-                TeleportService:TeleportToPlaceInstance(PlaceId, server.id, game.Players.LocalPlayer)
-                return
-            end
-        end
+    if success and servers and servers.data then  
+        for _, server in pairs(servers.data) do  
+            if server.id ~= game.JobId and server.playing >= 7 and server.playing <= 8 then  
+                TeleportService:TeleportToPlaceInstance(PlaceId, server.id, game.Players.LocalPlayer)  
+                return  
+            end  
+        end  
     end
 end
 
--- Tạo nút Toggle để bật/tắt đổi server
+-- Tạo Toggle để đổi server
 local Toggle = Hop_Tab:CreateToggle({
-    Name = "Tìm server full moon",
+    Name = "Tìm full moon",
     CurrentValue = false,
-    Flag = "Toggle1", -- Flag để tránh xung đột
+    Flag = "Toggle1",
     Callback = function(Value)
         if Value then
-            switchServer() -- Khi bật toggle, lập tức đổi server
+            switchServer()
         end
     end,
 })
@@ -695,30 +694,29 @@ local HttpService = game:GetService("HttpService")
 local TeleportService = game:GetService("TeleportService")
 local PlaceId = game.PlaceId
 
--- Hàm tìm và đổi server với điều kiện số người chơi từ 7-11
 local function switchServer()
     local success, servers = pcall(function()
         return HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"))
     end)
 
-    if success and servers and servers.data then
-        for _, server in pairs(servers.data) do
-            if server.id ~= game.JobId and server.playing >= 7 and server.playing <= 11 and server.playing < server.maxPlayers then
-                TeleportService:TeleportToPlaceInstance(PlaceId, server.id, game.Players.LocalPlayer)
-                return
-            end
-        end
+    if success and servers and servers.data then  
+        for _, server in pairs(servers.data) do  
+            if server.id ~= game.JobId and server.playing >= 7 and server.playing <= 8 then  
+                TeleportService:TeleportToPlaceInstance(PlaceId, server.id, game.Players.LocalPlayer)  
+                return  
+            end  
+        end  
     end
 end
 
--- Tạo nút Toggle để bật/tắt đổi server
+-- Tạo Toggle để đổi server
 local Toggle = Hop_Tab:CreateToggle({
-    Name = "Tìm server râu đen",
+    Name = "Tìm râu đen",
     CurrentValue = false,
-    Flag = "Toggle2", -- Flag để tránh xung đột
+    Flag = "Toggle2",
     Callback = function(Value)
         if Value then
-            switchServer() -- Khi bật toggle, lập tức đổi server
+            switchServer()
         end
     end,
 })
@@ -728,30 +726,29 @@ local HttpService = game:GetService("HttpService")
 local TeleportService = game:GetService("TeleportService")
 local PlaceId = game.PlaceId
 
--- Hàm tìm và đổi server với điều kiện số người chơi từ 7-11
 local function switchServer()
     local success, servers = pcall(function()
         return HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"))
     end)
 
-    if success and servers and servers.data then
-        for _, server in pairs(servers.data) do
-            if server.id ~= game.JobId and server.playing >= 7 and server.playing <= 11 and server.playing < server.maxPlayers then
-                TeleportService:TeleportToPlaceInstance(PlaceId, server.id, game.Players.LocalPlayer)
-                return
-            end
-        end
+    if success and servers and servers.data then  
+        for _, server in pairs(servers.data) do  
+            if server.id ~= game.JobId and server.playing >= 7 and server.playing <= 8 then  
+                TeleportService:TeleportToPlaceInstance(PlaceId, server.id, game.Players.LocalPlayer)  
+                return  
+            end  
+        end  
     end
 end
 
--- Tạo nút Toggle để bật/tắt đổi server
+-- Tạo Toggle để đổi server
 local Toggle = Hop_Tab:CreateToggle({
-    Name = "Tìm server katakuri V2",
+    Name = "Tìm Katakuri",
     CurrentValue = false,
-    Flag = "Toggle3", -- Flag để tránh xung đột
+    Flag = "Toggle3",
     Callback = function(Value)
         if Value then
-            switchServer() -- Khi bật toggle, lập tức đổi server
+            switchServer()
         end
     end,
 })
@@ -762,34 +759,64 @@ local HttpService = game:GetService("HttpService")
 local TeleportService = game:GetService("TeleportService")
 local PlaceId = game.PlaceId
 
--- Hàm tìm và đổi server với điều kiện số người chơi từ 7-11
 local function switchServer()
     local success, servers = pcall(function()
         return HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"))
     end)
 
-    if success and servers and servers.data then
-        for _, server in pairs(servers.data) do
-            if server.id ~= game.JobId and server.playing >= 7 and server.playing <= 11 and server.playing < server.maxPlayers then
-                TeleportService:TeleportToPlaceInstance(PlaceId, server.id, game.Players.LocalPlayer)
-                return
-            end
-        end
+    if success and servers and servers.data then  
+        for _, server in pairs(servers.data) do  
+            if server.id ~= game.JobId and server.playing >= 7 and server.playing <= 8 then  
+                TeleportService:TeleportToPlaceInstance(PlaceId, server.id, game.Players.LocalPlayer)  
+                return  
+            end  
+        end  
     end
 end
 
--- Tạo nút Toggle để bật/tắt đổi server
-local Toggle = MainTab:CreateToggle({
-    Name = "Tìm server rip_indra",
+-- Tạo Toggle để đổi server
+local Toggle = Hop_Tab:CreateToggle({
+    Name = "Tìm rip_indra",
     CurrentValue = false,
-    Flag = "Toggle4", -- Flag để tránh xung đột
+    Flag = "Toggle4",
     Callback = function(Value)
         if Value then
-            switchServer() -- Khi bật toggle, lập tức đổi server
+            switchServer()
         end
     end,
 })
 
+
+local HttpService = game:GetService("HttpService")
+local TeleportService = game:GetService("TeleportService")
+local PlaceId = game.PlaceId
+
+local function switchServer()
+    local success, servers = pcall(function()
+        return HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"))
+    end)
+
+    if success and servers and servers.data then  
+        for _, server in pairs(servers.data) do  
+            if server.id ~= game.JobId and server.playing >= 7 and server.playing <= 8 then  
+                TeleportService:TeleportToPlaceInstance(PlaceId, server.id, game.Players.LocalPlayer)  
+                return  
+            end  
+        end  
+    end
+end
+
+-- Tạo Toggle để đổi server
+local Toggle = Hop_Tab:CreateToggle({
+    Name = "Tìm quái lưỡi hãi",
+    CurrentValue = false,
+    Flag = "Toggle5",
+    Callback = function(Value)
+        if Value then
+            switchServer()
+        end
+    end,
+})
 
 
 
