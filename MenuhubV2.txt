@@ -292,95 +292,81 @@ local ToggleAimbot = PVP_Tab:CreateToggle({
 
 
 local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local Camera = game.Workspace.CurrentCamera
+local HttpService = game:GetService("HttpService")
 
-local camLockEnabled = false
-local camLockedPlayer = nil
-local camera = workspace.CurrentCamera
+local aimEnabled = false  -- Trạng thái bật/tắt aim
+local targetPlayer = nil  -- Người chơi bị aim
 
--- Hàm tìm người chơi trước mặt
-local function getClosestPlayer()
-    local maxDistance = 30 -- Khoảng cách tối đa để nhận diện player
-    local closestPlayer = nil
-    local shortestDistance = maxDistance
+-- 🌕 Hàm tìm player gần nhất
+local function getNearestPlayer()
+    local nearestDistance = math.huge
+    local nearestPlayer = nil
 
     for _, player in pairs(Players:GetPlayers()) do
         if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-            local rootPart = player.Character.HumanoidRootPart
-            local distance = (rootPart.Position - camera.CFrame.Position).magnitude
-            local direction = (rootPart.Position - camera.CFrame.Position).unit
-            local lookVector = camera.CFrame.LookVector
-            
-            local angle = math.acos(lookVector:Dot(direction))
-            
-            if distance < shortestDistance and angle < math.rad(15) then -- Góc nhỏ hơn 15 độ
-                closestPlayer = player
-                shortestDistance = distance
+            local char = player.Character
+            local distance = (LocalPlayer.Character.HumanoidRootPart.Position - char.HumanoidRootPart.Position).magnitude
+
+            if distance < nearestDistance then
+                nearestDistance = distance
+                nearestPlayer = player
             end
         end
     end
-    return closestPlayer
+
+    return nearestPlayer
 end
 
--- Cam lock loop
-RunService.RenderStepped:Connect(function()
-    if camLockEnabled and camLockedPlayer and camLockedPlayer.Character and camLockedPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        local rootPart = camLockedPlayer.Character.HumanoidRootPart
-        camera.CFrame = CFrame.new(camera.CFrame.Position, rootPart.Position)
+-- 🎯 Hàm aim vào player gần nhất
+local function aimAtNearestPlayer()
+    if aimEnabled then
+        targetPlayer = getNearestPlayer()
+        if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            local targetPos = targetPlayer.Character.HumanoidRootPart.Position
+            LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.lookAt(LocalPlayer.Character.HumanoidRootPart.Position, targetPos)
+            Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, targetPos)
+        end
     end
+end
+
+-- 🔄 Luôn aim vào player gần nhất nếu bật
+RunService.RenderStepped:Connect(function()
+    aimAtNearestPlayer()
 end)
 
--- Toggle cam lock
-local function toggleCamLock(state)
-    camLockEnabled = state
-
-    if camLockEnabled then
-        camLockedPlayer = getClosestPlayer()
-        if camLockedPlayer then
-            Rayfield:Notify({
-                Title = "Cam Lock Activated",
-                Content = "Đang cam lock: " .. camLockedPlayer.Name,
-                Duration = 5,
-                Image = 13047715178,
-                Actions = {
-                    Ignore = { Name = "OK", Callback = function() end }
-                },
-            })
-        else
-            Rayfield:Notify({
-                Title = "Cam Lock Failed",
-                Content = "Không tìm thấy người chơi trước mặt!",
-                Duration = 5,
-                Image = 13047715178,
-                Actions = {
-                    Ignore = { Name = "OK", Callback = function() end }
-                },
-            })
-            camLockEnabled = false
-        end
-    else
-        camLockedPlayer = nil
-        Rayfield:Notify({
-            Title = "Cam Lock Disabled",
-            Content = "Đã tắt cam lock.",
-            Duration = 5,
-            Image = 13047715178,
-            Actions = {
-                Ignore = { Name = "OK", Callback = function() end }
-            },
-        })
-    end
+-- 🎭 Hiển thị GUI thông báo
+local function showNotification(msg)
+    Rayfield:Notify({
+        Title = "Thông báo",
+        Content = msg,
+        Duration = 3,
+        Image = 13047715178,
+        Actions = {
+            Okay = {
+                Name = "Đã hiểu",
+                Callback = function()
+                    print("User acknowledged notification")
+                end
+            }
+        },
+    })
 end
 
--- Tạo nút bật/tắt cam lock
+-- 🔘 Tạo Toggle bật/tắt aim
 local Toggle = PVP_Tab:CreateToggle({
-   Name = "Cam Lock",
+   Name = "Aimlock Player",
    CurrentValue = false,
-   Flag = "CamLockToggle",
+   Flag = "AimToggle",
    Callback = function(Value)
-        toggleCamLock(Value)
+        aimEnabled = Value
+        if aimEnabled then
+            showNotification("Đang aim vào player gần nhất!")
+        else
+            showNotification("Đã tắt aim player!")
+        end
    end,
 })
 
@@ -918,11 +904,4 @@ local Toggle = Hop_Tab:CreateToggle({
 
 
 
-local TPTab = Window:CreateTab("🎲 Misc", nil) -- Title, Image            
-           
-          
-  
-
-
-
-local TPTab = Window:CreateTab("🎲 Misc", nil) -- Title, Image 
+local TPTab = Window:CreateTab("🎲 Misc", nil) -- Title, Image
