@@ -1,7 +1,7 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-   Name = "🔰 Kzu Hub | Game 🔰",
+   Name = "🔰 Kzu Hub [Free] | Game 🔰",
    LoadingTitle = "🔰 Kzu hub [Free] 🔰",
    LoadingSubtitle = "by Kzu123",
    ConfigurationSaving = {
@@ -291,100 +291,84 @@ local ToggleAimbot = PVP_Tab:CreateToggle({
 
 
 
-
 local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
-local Camera = game.Workspace.CurrentCamera
-local LocalPlayer = Players.LocalPlayer
 
 local camLockEnabled = false
-local lockedPlayer = nil
+local camLockedPlayer = nil
+local camera = workspace.CurrentCamera
 
-local function getLookedAtPlayer()
-    local mouse = LocalPlayer:GetMouse()
-    local target = mouse.Target
-    
-    if target and target.Parent then
-        local character = target.Parent
-        local player = Players:GetPlayerFromCharacter(character)
-        if player and player ~= LocalPlayer then
-            return player
+-- Hàm tìm người chơi trước mặt
+local function getClosestPlayer()
+    local maxDistance = 30 -- Khoảng cách tối đa để nhận diện player
+    local closestPlayer = nil
+    local shortestDistance = maxDistance
+
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local rootPart = player.Character.HumanoidRootPart
+            local distance = (rootPart.Position - camera.CFrame.Position).magnitude
+            local direction = (rootPart.Position - camera.CFrame.Position).unit
+            local lookVector = camera.CFrame.LookVector
+            
+            local angle = math.acos(lookVector:Dot(direction))
+            
+            if distance < shortestDistance and angle < math.rad(15) then -- Góc nhỏ hơn 15 độ
+                closestPlayer = player
+                shortestDistance = distance
+            end
         end
     end
-    return nil
+    return closestPlayer
 end
 
-local function lockCameraOnPlayer(player)
-    if not player or not player.Character then return end
-    local rootPart = player.Character:FindFirstChild("HumanoidRootPart")
-    
-    if rootPart then
-        Camera.CameraType = Enum.CameraType.Scriptable
-        RunService.RenderStepped:Connect(function()
-            if camLockEnabled and lockedPlayer == player then
-                Camera.CFrame = CFrame.new(Camera.CFrame.Position, rootPart.Position)
-            end
-        end)
+-- Cam lock loop
+RunService.RenderStepped:Connect(function()
+    if camLockEnabled and camLockedPlayer and camLockedPlayer.Character and camLockedPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        local rootPart = camLockedPlayer.Character.HumanoidRootPart
+        camera.CFrame = CFrame.new(camera.CFrame.Position, rootPart.Position)
     end
-end
+end)
 
-local function toggleCamLock()
-    camLockEnabled = not camLockEnabled
+-- Toggle cam lock
+local function toggleCamLock(state)
+    camLockEnabled = state
 
     if camLockEnabled then
-        local targetPlayer = getLookedAtPlayer()
-        if targetPlayer then
-            lockedPlayer = targetPlayer
-            lockCameraOnPlayer(lockedPlayer)
-            
-            -- Hiển thị thông báo
+        camLockedPlayer = getClosestPlayer()
+        if camLockedPlayer then
             Rayfield:Notify({
-                Title = "Cam Lock Bật",
-                Content = "Đang cam lock: " .. lockedPlayer.Name,
+                Title = "Cam Lock Activated",
+                Content = "Đang cam lock: " .. camLockedPlayer.Name,
                 Duration = 5,
                 Image = 13047715178,
                 Actions = {
-                    Ignore = {
-                        Name = "Okay!",
-                        Callback = function()
-                            print("Cam lock đã bật")
-                        end
-                    }
+                    Ignore = { Name = "OK", Callback = function() end }
                 },
             })
         else
-            camLockEnabled = false
             Rayfield:Notify({
-                Title = "Cam Lock Thất Bại",
-                Content = "Hãy nhìn vào một người chơi trước!",
+                Title = "Cam Lock Failed",
+                Content = "Không tìm thấy người chơi trước mặt!",
                 Duration = 5,
                 Image = 13047715178,
                 Actions = {
-                    Ignore = {
-                        Name = "Okay!",
-                        Callback = function()
-                            print("Không tìm thấy người chơi")
-                        end
-                    }
+                    Ignore = { Name = "OK", Callback = function() end }
                 },
             })
+            camLockEnabled = false
         end
     else
-        Camera.CameraType = Enum.CameraType.Custom
-        lockedPlayer = nil
+        camLockedPlayer = nil
         Rayfield:Notify({
-            Title = "Cam Lock Tắt",
-            Content = "Đã tắt cam lock!",
+            Title = "Cam Lock Disabled",
+            Content = "Đã tắt cam lock.",
             Duration = 5,
             Image = 13047715178,
             Actions = {
-                Ignore = {
-                    Name = "Okay!",
-                    Callback = function()
-                        print("Cam lock đã tắt")
-                    end
-                }
+                Ignore = { Name = "OK", Callback = function() end }
             },
         })
     end
@@ -392,12 +376,12 @@ end
 
 -- Tạo nút bật/tắt cam lock
 local Toggle = PVP_Tab:CreateToggle({
-    Name = "Camlock Player",
-    CurrentValue = false,
-    Flag = "Camlock",
-    Callback = function(Value)
-        toggleCamLock()
-    end,
+   Name = "Cam Lock",
+   CurrentValue = false,
+   Flag = "CamLockToggle",
+   Callback = function(Value)
+        toggleCamLock(Value)
+   end,
 })
 
 
@@ -934,4 +918,11 @@ local Toggle = Hop_Tab:CreateToggle({
 
 
 
-local TPTab = Window:CreateTab("🎲 Misc", nil) -- Title, Image
+local TPTab = Window:CreateTab("🎲 Misc", nil) -- Title, Image            
+           
+          
+  
+
+
+
+local TPTab = Window:CreateTab("🎲 Misc", nil) -- Title, Image 
