@@ -291,19 +291,13 @@ local ToggleAimbot = PVP_Tab:CreateToggle({
 
 
 
--- Sử dụng thư viện Rayfield mà bạn đã có
-local Library = Rayfield  -- Đây là biến bạn đã định nghĩa cho thư viện Rayfield
-local Window = Library:CreateWindow("Aimlock Toggle")
-local AimlockTab = Window:CreateTab("🎯 Aimlock")
-
 local aimlockEnabled = false
 local aimlockScript = "https://raw.githubusercontent.com/Shade-vex/b/refs/heads/main/Aimlock.txt"
 
--- Tạo toggle Aimlock
-local Toggle = AimlockTab:CreateToggle({
-   Name = "Aimlock",
-   CurrentValue = false,
-   Flag = "Aimlock_Toggle",
+local Toggle = PVP_Tab:CreateToggle({
+   Name = "Aimlock",  -- Tên của nút toggle
+   CurrentValue = false,  -- Giá trị ban đầu của nút
+   Flag = "Aimlock_Toggle",  -- Dùng flag để xác định
    Callback = function(Value)
         aimlockEnabled = Value
         if aimlockEnabled then
