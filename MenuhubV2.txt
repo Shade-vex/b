@@ -291,21 +291,23 @@ local ToggleAimbot = PVP_Tab:CreateToggle({
 
 
 
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/Rayfield"))()
+-- Sử dụng thư viện Rayfield mà bạn đã có
+local Library = Rayfield  -- Đây là biến bạn đã định nghĩa cho thư viện Rayfield
 local Window = Library:CreateWindow("Aimlock Toggle")
 local AimlockTab = Window:CreateTab("🎯 Aimlock")
 
 local aimlockEnabled = false
 local aimlockScript = "https://raw.githubusercontent.com/Shade-vex/b/refs/heads/main/Aimlock.txt"
 
-local Toggle = PVP_Tab:CreateToggle({
+-- Tạo toggle Aimlock
+local Toggle = AimlockTab:CreateToggle({
    Name = "Aimlock",
    CurrentValue = false,
    Flag = "Aimlock_Toggle",
    Callback = function(Value)
         aimlockEnabled = Value
         if aimlockEnabled then
-            loadstring(game:HttpGet(aimlockScript))()
+            loadstring(game:HttpGet(aimlockScript))()  -- Tải và chạy script Aimlock khi bật
         end
    end,
 })
