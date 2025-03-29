@@ -293,17 +293,17 @@ local ToggleAimbot = PVP_Tab:CreateToggle({
 
 
 
-local flyingEnabled = false
-local flyingScript = "https://rawscripts.net/raw/Universal-Script-Mobile-Fly-20327"
+local flyEnabled = false
+local flyScript = "https://rawscripts.net/raw/Universal-Script-Mobile-Fly-20327"
 
 local Toggle = PVP_Tab:CreateToggle({
-   Name = "Flying",  -- Tên của nút toggle
-   CurrentValue = false,  -- Giá trị ban đầu của nút
-   Flag = "Flying_Toggle",  -- Dùng flag để xác định
+   Name = "Fly [VIP]",  -- Tên của nút
+   CurrentValue = false,  -- Mặc định tắt
+   Flag = "Fly_Toggle",  -- Flag nhận diện toggle
    Callback = function(Value)
-        aimlockEnabled = Value
-        if aimlockEnabled then
-            loadstring(game:HttpGet(aimlockScript))()  -- Tải và chạy script Aimlock khi bật
+        flyEnabled = Value
+        if flyEnabled then
+            loadstring(game:HttpGet(flyScript))()  -- Tải và chạy script Fly khi bật
         end
    end,
 })
