@@ -291,6 +291,28 @@ local ToggleAimbot = PVP_Tab:CreateToggle({
 
 
 
+
+
+local flyingEnabled = false
+local flyingScript = "https://rawscripts.net/raw/Universal-Script-Mobile-Fly-20327"
+
+local Toggle = PVP_Tab:CreateToggle({
+   Name = "Flying",  -- Tên của nút toggle
+   CurrentValue = false,  -- Giá trị ban đầu của nút
+   Flag = "Flying_Toggle",  -- Dùng flag để xác định
+   Callback = function(Value)
+        aimlockEnabled = Value
+        if aimlockEnabled then
+            loadstring(game:HttpGet(aimlockScript))()  -- Tải và chạy script Aimlock khi bật
+        end
+   end,
+})
+
+
+
+
+
+
 local aimlockEnabled = false
 local aimlockScript = "https://raw.githubusercontent.com/Shade-vex/b/refs/heads/main/Aimlock.txt"
 
